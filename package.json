@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "serve -s _static -l tcp://0.0.0.0:$PORT -n",
+    "start": "serve -s dist -l tcp://0.0.0.0:$PORT -n",
     "dev": "vite",
-    "build": "rm -r _static 2>/dev/null; vite build && mv build _static",
+    "build": "rm -r dist 2>/dev/null; node sammy.js; vite build && mv build dist",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
