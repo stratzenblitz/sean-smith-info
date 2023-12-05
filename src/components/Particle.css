@@ -1,8 +1,0 @@
-.particle {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background-color: #ff0000; /* Set particle color */
-    border-radius: 50%; /* Make it a circle */
-    z-index: -1; /* Lower z-index value */
-  }
