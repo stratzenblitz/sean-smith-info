@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './App.css';
+import {ParticleCanvas} from './ParticleCanvas.tsx'
+import { Box, Typography } from '@mui/material';
 
 // Particle component
 const Particle = ({ x, y, velocityX, velocityY }) => {
@@ -88,7 +90,7 @@ const getRandomParticleArray = (numParticles) => {
 
 // Background component using the particle array
 const Background = () => {
-  const particleArray = getRandomParticleArray(100); // Adjust the number of particles
+  const particleArray = getRandomParticleArray(500); // Adjust the number of particles
 
   return (
     <div
@@ -108,11 +110,32 @@ const Background = () => {
 
 // App component
 const App = () => (
-  <div style={{ position: 'relative' }}>
-    <h1 className="header">{}
-      THE BALL PIT
-    </h1>
-    <Background />
+  <div className='App'>
+    <ParticleCanvas />
+
+    <Box
+      sx={{
+        position: 'relative',
+        zIndex: 1, 
+        
+        // This is our centering logic
+        height: '100vh',
+        display: 'grid',
+        placeItems: 'center',
+        textAlign: 'center',
+        
+        // And our text styling
+        fontFamily: 'Roboto, sans-serif',
+        color: 'white',
+      }}
+    >
+      <Typography variant="h2" component="h1" gutterBottom>
+        Bouncing Particles
+      </Typography>
+      <Typography variant="h3" component="h1" gutterBottom>
+        By Shoughn
+      </Typography>
+    </Box>
   </div>
 );
 
