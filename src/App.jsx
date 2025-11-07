@@ -119,7 +119,7 @@ const App = () => (
         zIndex: 1, 
         
         // This is our centering logic
-        height: '100vh',
+        height: '90vh',
         display: 'grid',
         placeItems: 'center',
         textAlign: 'center',
@@ -127,14 +127,26 @@ const App = () => (
         // And our text styling
         fontFamily: 'Roboto, sans-serif',
         color: 'white',
+        overflowY: 'scroll',
+
+        // For WebKit browsers (Chrome, Safari, Edge)
+        '&::-webkit-scrollbar': {
+          display: 'none',
+        },
+        // For Firefox
+        scrollbarWidth: 'none',
+        // For IE/Edge (older)
+        '-ms-overflow-style': 'none',
       }}
     >
-      <Typography variant="h2" component="h1" gutterBottom>
-        Bouncing Particles
-      </Typography>
-      <Typography variant="h3" component="h1" gutterBottom>
-        By Shoughn
-      </Typography>
+      <Box>
+          <Typography variant="h1" component="h1" color='rgba(216, 216, 216, 1)' gutterBottom>
+          Fireflies
+        </Typography>
+        <Typography variant="h4" component="h1" color='rgba(216, 216, 216, 1)' gutterBottom>
+          <i>By Shoughn</i>
+        </Typography>
+      </Box>
     </Box>
   </div>
 );

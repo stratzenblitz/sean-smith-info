@@ -2,7 +2,6 @@ import React, {useRef, useEffect} from 'react';
 
 import { Vector2D } from './Vector2D';
 
-const GRAVITY = new Vector2D(0, 0.001);
 
 interface ClampResult {
     val: number,
@@ -29,21 +28,58 @@ class Particle {
         public pos: Vector2D,
         public vel: Vector2D,
         public radius: number,
-        public color: string
-    ) {}
+        public color: string,
+        public blinkColor: string,
+        public randomControlChance: number,
+        public randomControlMaxMagnitude: number,
+        public randomControlDuration: number
+    ) {
+        this.currentColor = color;
+    }
+
+    private control: Vector2D | undefined;
+    private controlEnergy: number | undefined;
+    private currentColor: string;
+    
+
+    generateRandomControl(): void {
+        if (!this.control) {
+            const value: number = Math.random();
+            if (value < this.randomControlChance) {
+                const controlMagnitude: number = Math.random() * this.randomControlMaxMagnitude;
+                this.control = getRandomVelocity(controlMagnitude);
+                this.controlEnergy = this.randomControlDuration;
+            }
+        }
+
+        if(this.controlEnergy) {
+            this.controlEnergy -= 1;
+            this.currentColor = this.blinkColor;
+            this.radius = 4.0
+
+            if (this.controlEnergy <= 0) {
+                this.radius = 2.0
+                this.currentColor = this.color;
+                this.control = undefined;
+                this.controlEnergy = undefined;
+            }
+        }
+    }
 
     update(bounds: Bounds): void {
-        this.vel.add(GRAVITY);
+        if (this.control) {
+            this.vel.add(this.control);
+        }
         this.pos.add(this.vel);
 
-        const epsilon: number = 0.01;
+        const epsilon: number = 0.1;
 
         // X bounds
         const xClampResult = clamp(this.pos.x, 0 + this.radius + epsilon, bounds.width - this.radius - epsilon);
         this.pos.x = xClampResult.val
 
         if (xClampResult.clamped) {
-            this.vel.x *= -1;
+            this.vel.x *= -1.0;
         }
 
         // Y bounds
@@ -51,14 +87,14 @@ class Particle {
         this.pos.y = yClampResult.val
 
         if (yClampResult.clamped) {
-            this.vel.y *= -1;
+            this.vel.y *= -1.0;
         }
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
         ctx.beginPath();
         ctx.arc(this.pos.x, this.pos.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
+        ctx.fillStyle = this.currentColor;
         // ctx.strokeStyle = "white";
         // ctx.lineWidth = 2;
 
@@ -90,9 +126,13 @@ function getRandomParticleArray(particleCount: number, bounds: Bounds): Particle
      for (let i = 0; i < particleCount; i++) {
         particleArray.push(new Particle(
             getRandomPosition(bounds),
-            getRandomVelocity(2),
-            5,
-            "gray"
+            getRandomVelocity(0.2),
+            2,
+            'rgba(32, 32, 32, 1)',
+            'rgba(221, 255, 49, 1)',
+            0.001,
+            0.005,
+            100.0
         ));
     }
 
@@ -101,6 +141,7 @@ function getRandomParticleArray(particleCount: number, bounds: Bounds): Particle
 
 function animateParticles(particles: Particle[], bounds: Bounds): void {
     for (const particle of particles) {
+        particle.generateRandomControl();
         particle.update(bounds);
     }
 }
@@ -115,7 +156,7 @@ function drawParticles(particles: Particle[], ctx: CanvasRenderingContext2D): vo
 // UseEffect with no dep array will continuously re-run in an infinite loop
 
 
-export const ParticleCanvas = ({particleCount = 500}) => {
+export const ParticleCanvas = ({density = 4000}) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const particlesRef = useRef<Particle[]>([])
@@ -139,13 +180,19 @@ export const ParticleCanvas = ({particleCount = 500}) => {
         };
         setCanvasSize();
 
+        const particleCount = Math.floor(canvas.width * canvas.height / density)
+
         const bounds: Bounds = { width: canvas.width, height: canvas.height };
         particlesRef.current = getRandomParticleArray(particleCount, bounds);
+
+        ctx.fillStyle = 'rgba(0, 0, 0, 1.0)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
 
         const animate = () => {
             const bounds: Bounds = {width: canvas.width, height: canvas.height};
 
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             animateParticles(particlesRef.current, bounds);
@@ -164,7 +211,7 @@ export const ParticleCanvas = ({particleCount = 500}) => {
             }
             window.removeEventListener('resize', setCanvasSize);
         }
-    }, [particleCount])
+    }, [density])
 
     return (
         <canvas ref={canvasRef}
