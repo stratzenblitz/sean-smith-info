@@ -163,6 +163,8 @@ export const ParticleCanvas = ({density = 4000}) => {
 
     const animationFrameIdRef = useRef<number | null>(null);
 
+    const frameCount = useRef<number>(0);
+
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) {
@@ -185,15 +187,21 @@ export const ParticleCanvas = ({density = 4000}) => {
         const bounds: Bounds = { width: canvas.width, height: canvas.height };
         particlesRef.current = getRandomParticleArray(particleCount, bounds);
 
-        ctx.fillStyle = 'rgba(0, 0, 0, 1.0)';
+        ctx.fillStyle = 'rgba(5, 5, 5, 1)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 
         const animate = () => {
             const bounds: Bounds = {width: canvas.width, height: canvas.height};
+            frameCount.current += 1;
 
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = 'rgba(50, 50, 50, 0.1)';
+            
+            if (frameCount.current % 5 == 0) {
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
 
             animateParticles(particlesRef.current, bounds);
             drawParticles(particlesRef.current, ctx);
