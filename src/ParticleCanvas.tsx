@@ -35,18 +35,20 @@ class Particle {
         public randomControlDuration: number
     ) {
         this.currentColor = color;
+        this.drag = 0.9995;
     }
 
     private control: Vector2D | undefined;
     private controlEnergy: number | undefined;
     private currentColor: string;
+    private drag: number;
     
 
     generateRandomControl(): void {
         if (!this.control) {
             const value: number = Math.random();
             if (value < this.randomControlChance) {
-                const controlMagnitude: number = Math.random() * this.randomControlMaxMagnitude;
+                const controlMagnitude: number = this.randomControlMaxMagnitude;
                 this.control = getRandomVelocity(controlMagnitude);
                 this.controlEnergy = this.randomControlDuration;
             }
@@ -70,6 +72,7 @@ class Particle {
         if (this.control) {
             this.vel.add(this.control);
         }
+        this.vel.multiplyScalar(this.drag);
         this.pos.add(this.vel);
 
         const epsilon: number = 0.1;
@@ -129,9 +132,9 @@ function getRandomParticleArray(particleCount: number, bounds: Bounds): Particle
             getRandomVelocity(0.2),
             2,
             'rgba(32, 32, 32, 1)',
-            'rgba(221, 255, 49, 1)',
+            'rgba(255, 190, 49, 1)',
             0.001,
-            0.005,
+            0.01,
             100.0
         ));
     }
